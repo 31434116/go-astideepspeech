@@ -7,9 +7,9 @@ extern "C" {
             ModelState* model;
 
         public:
-            ModelWrapper(const char* aModelPath, int aBeamWidth)
+            ModelWrapper(const char* aModelPath)
             {
-                DS_CreateModel(aModelPath, aBeamWidth, &model);
+                DS_CreateModel(aModelPath, &model);
             }
 
             ~ModelWrapper()
@@ -17,10 +17,21 @@ extern "C" {
                 DS_FreeModel(model);
             }
 
-            void enableDecoderWithLM(const char* aLMPath, const char* aTriePath, float aLMWeight, float aValidWordCountWeight)
-            {
-                DS_EnableDecoderWithLM(model, aLMPath, aTriePath, aLMWeight, aValidWordCountWeight);
-            }
+	    void setModelBeamWidth(unsigned int aBeamWidth) {
+		DS_SetModelBeamWidth(model, aBeamWidth);
+	    }
+
+	    unsigned int getModelBeamWidth() {
+		return DS_GetModelBeamWidth(model);
+	    }
+
+	    void enableExternalScorer(const char* aScorerPath) {
+		DS_EnableExternalScorer(model, aScorerPath);
+	    }
+
+	    void disableExternalScorer() {
+		DS_DisableExternalScorer(model);
+	    }
 
 	    int getModelSampleRate()
 	    {
@@ -43,18 +54,29 @@ extern "C" {
             }
     };
 
-    ModelWrapper* New(const char* aModelPath, int aBeamWidth)
+    ModelWrapper* New(const char* aModelPath)
     {
-        return new ModelWrapper(aModelPath, aBeamWidth);
+        return new ModelWrapper(aModelPath);
     }
     void Close(ModelWrapper* w)
     {
         delete w;
     }
 
-    void EnableDecoderWithLM(ModelWrapper* w, const char* aLMPath, const char* aTriePath, float aLMWeight, float aValidWordCountWeight)
-    {
-        w->enableDecoderWithLM(aLMPath, aTriePath, aLMWeight, aValidWordCountWeight);
+    void SetModelBeamWidth(ModelWrapper* w, unsigned int aBeamWidth) {
+        w->setModelBeamWidth(aBeamWidth);
+    }
+
+    unsigned int GetModelBeamWidth(ModelWrapper* w) {
+	return w->getModelBeamWidth();
+    }
+
+    void EnableExternalScorer(ModelWrapper* w, const char* aScorerPath) {
+	w->enableExternalScorer(aScorerPath);
+    }
+
+    void DisableExternalScorer(ModelWrapper* w) {
+	w->disableExternalScorer();
     }
 
     int GetModelSampleRate(ModelWrapper* w)
@@ -182,8 +204,8 @@ extern "C" {
         DS_FreeMetadata(m);
     }
 
-    void PrintVersions()
+    char* GetVersion()
     {
-        DS_PrintVersions();
+        return DS_Version();
     }
 }

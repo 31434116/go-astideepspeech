@@ -32,14 +32,23 @@ func (m *Model) Close() error {
 	return nil
 }
 
-// EnableDecoderWithLM enables decoding using beam scoring with a KenLM language model.
+func (m *Model) SetModelBeamWidth(beamWidth uint) {
+	C.SetModelBeamWidth(m.w, C.uint(beamWidth))
+}
+
+func (m *Model) GetModelBeamWidth() uint {
+	return uint(C.GetModelBeamWidth(m.w))
+}
+
+// EnableExternalScorer enables decoding using beam scoring with a KenLM language model.
 //
 // lmPath 	        The path to the language model binary file.
-// triePath 	        The path to the trie file build from the same vocabulary as the language model binary.
-// lmWeight 	        The weight to give to language model results when scoring.
-// validWordCountWeight The weight (bonus) to give to beams when adding a new valid word to the decoding.
-func (m *Model) EnableDecoderWithLM(lmPath, triePath string, lmWeight, validWordCountWeight float64) {
-	C.EnableDecoderWithLM(m.w, C.CString(lmPath), C.CString(triePath), C.float(lmWeight), C.float(validWordCountWeight))
+func (m *Model) EnableExternalScorer(scorerPath string) {
+	C.EnableExternalScorer(m.w, C.CString(scorerPath))
+}
+
+func (m *Model) DisableExternalScorer() {
+	C.DisableExternalScorer(m.w)
 }
 
 // GetModelSampleRate read the sample rate that was used to produce the model file.
@@ -160,6 +169,9 @@ func (s *Stream) FreeStream() {
 }
 
 // PrintVersions Print version of this library and of the linked TensorFlow library.
-func PrintVersions() {
-	C.PrintVersions()
+func GetVersion() string {
+	str := C.GetVersion()
+	defer C.FreeString(str)
+	retval := C.GoString(str)
+	return retval
 }

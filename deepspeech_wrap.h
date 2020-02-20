@@ -16,7 +16,10 @@ extern "C" {
     typedef void* ModelWrapper;
     ModelWrapper* New(const char* aModelPath, int aBeamWidth);
     void Close(ModelWrapper* w);
-    void EnableDecoderWithLM(ModelWrapper* w, const char* aLMPath, const char* aTriePath, float aLMWeight, float aValidWordCountWeight);
+    void SetModelBeamWidth(ModelWrapper* w, unsigned int aBeamWidth);
+    unsigned int GetModelBeamWidth(ModelWrapper* w);
+    void EnableExternalScorer(ModelWrapper* w, const char* aScorerPath);
+    void DisableExternalScorer(ModelWrapper* w);
     int GetModelSampleRate(ModelWrapper* w);
     char* STT(ModelWrapper* w, const short* aBuffer, unsigned int aBufferSize);
     Metadata* STTWithMetadata(ModelWrapper* w, const short* aBuffer, unsigned int aBufferSize);
@@ -39,7 +42,7 @@ extern "C" {
 
     void FreeString(char* s);
     void FreeMetadata(Metadata* m);
-    void PrintVersions();
+    char* GetVersion();
 
 #ifdef __cplusplus
 }

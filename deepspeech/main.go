@@ -20,8 +20,7 @@ const (
 
 var model = flag.String("model", "", "Path to the model (protocol buffer binary file)")
 var audio = flag.String("audio", "", "Path to the audio file to run (WAV format)")
-var lm = flag.String("lm", "", "Path to the language model binary file")
-var trie = flag.String("trie", "", "Path to the language model trie file created with native_client/generate_trie")
+var scorer = flag.String("scorer", "", "Path to the language model binary file")
 var version = flag.Bool("version", false, "Print version and exits")
 var extended = flag.Bool("extended", false, "Use extended metadata")
 
@@ -38,7 +37,8 @@ func main() {
 	log.SetFlags(0)
 
 	if *version {
-		astideepspeech.PrintVersions()
+		ver := astideepspeech.GetVersion()
+		log.Printf("Version: %s\n", ver)
 		return
 	}
 
@@ -53,8 +53,8 @@ func main() {
 	// Initialize DeepSpeech
 	m := astideepspeech.New(*model, beamWidth)
 	defer m.Close()
-	if *lm != "" {
-		m.EnableDecoderWithLM(*lm, *trie, lmWeight, validWordCountWeight)
+	if *scorer != "" {
+		m.EnableExternalScorer(*scorer)
 	}
 
 	// Stat audio
