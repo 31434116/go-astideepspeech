@@ -1,4 +1,4 @@
-module github.com/asticode/go-astideepspeech
+module github.com/31434116/go-astideepspeech
 
 go 1.13
 
